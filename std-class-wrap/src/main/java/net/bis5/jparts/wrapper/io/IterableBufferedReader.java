@@ -19,11 +19,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.nio.CharBuffer;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 /**
  * {@link Iterable} implemented {@link BufferedReader}.
@@ -49,15 +46,12 @@ import java.util.stream.Stream;
  */
 public class IterableBufferedReader extends BufferedReader implements Iterable<String> {
 
-	protected final BufferedReader reader;
-
-	public IterableBufferedReader(BufferedReader in) {
-		super(null);
-		reader = Objects.requireNonNull(in);
+	public IterableBufferedReader(Reader in) {
+		super(in);
 	}
 
-	public IterableBufferedReader(Reader in) {
-		this(new BufferedReader(in));
+	public IterableBufferedReader(Reader in, int sz) {
+		super(in, sz);
 	}
 
 	/**
@@ -65,17 +59,12 @@ public class IterableBufferedReader extends BufferedReader implements Iterable<S
 	 */
 	@Override
 	public Iterator<String> iterator() {
-		return new BufferedReaderIterator(reader);
+		return new BufferedReaderIterator();
 	}
 
-	protected static class BufferedReaderIterator implements Iterator<String> {
+	protected class BufferedReaderIterator implements Iterator<String> {
 
-		protected final BufferedReader reader;
 		private String nextLine;
-
-		public BufferedReaderIterator(BufferedReader reader) {
-			this.reader = Objects.requireNonNull(reader);
-		}
 
 		/**
 		 * {@inheritDoc}
@@ -87,7 +76,7 @@ public class IterableBufferedReader extends BufferedReader implements Iterable<S
 				return true;
 			}
 			try {
-				nextLine = reader.readLine();
+				nextLine = readLine();
 			} catch (IOException ex) {
 				throw new UncheckedIOException(ex);
 			}
@@ -107,111 +96,6 @@ public class IterableBufferedReader extends BufferedReader implements Iterable<S
 				throw new NoSuchElementException();
 			}
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public int hashCode() {
-		return reader.hashCode();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public int read(CharBuffer target) throws IOException {
-		return reader.read(target);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean equals(Object obj) {
-		return reader.equals(obj);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public int read(char[] cbuf) throws IOException {
-		return reader.read(cbuf);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public int read() throws IOException {
-		return reader.read();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public int read(char[] cbuf, int off, int len) throws IOException {
-		return reader.read(cbuf, off, len);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String toString() {
-		return reader.toString();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String readLine() throws IOException {
-		return reader.readLine();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public long skip(long n) throws IOException {
-		return reader.skip(n);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean ready() throws IOException {
-		return reader.ready();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean markSupported() {
-		return reader.markSupported();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void mark(int readAheadLimit) throws IOException {
-		reader.mark(readAheadLimit);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void reset() throws IOException {
-		reader.reset();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void close() throws IOException {
-		reader.close();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public Stream<String> lines() {
-		return reader.lines();
 	}
 
 }
